@@ -1,0 +1,7 @@
+obj_dir/
+results/
+*.vcd
+*.fst
+synth_*.v
+*.log
+.history_sta
