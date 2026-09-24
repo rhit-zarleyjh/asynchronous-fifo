@@ -1,8 +1,10 @@
 # CDC Foundations
 
-A SystemVerilog asynchronous FIFO demonstrating fundamental clock-domain crossing (CDC) techniques for transferring multi-bit data between independently clocked domains.
+This SystemVerilog asynchronous FIFO demonstrates fundamental clock-domain crossing (CDC) techniques. Two external devices that do not share a clock do not know how to communicate with each other. One may send data at a certain rate, and the other may be reading far less frequently, missing data. There is also the consideration of metastability in the registers we use to store data, where changing inputs may cause unknown outputs temporarily. This may cause issues with downstream logic.
 
-The design uses dual-clock storage, binary and Gray-coded pointers, two-stage pointer synchronizers, and domain-local full/empty generation. Verification exercises the FIFO across varying asynchronous clock relationships, pointer wraparound, boundary conditions, concurrent traffic, and reset behavior.
+The design uses dual-clock storage, binary and Gray-coded pointers, two-stage pointer synchronizers, and domain-local full/empty generation. Essentially, we transform standard pointers, which allow us to read to and write from memory, into Gray-coded pointers. This allows us to safely change our pointer value such that, even with metastability, we will never pass a dangerous value downstream, where it might cause true issues. Instead, we will either pass a fresh value, or a past value, both of which will be safe. The input-side domain checks for the FIFO being full to prevent the module claiming to be able to hold data while being full, resulting in data loss. Likewise, the output-side domain checks for the FIFO being empty, preventing us from accidentally outputting a value that was never truly given.
+
+This demonstrates the ability to use structures that naturally lend themselves to the task at hand (Gray-coded pointers) and establish correctness under uncertain conditions (domain-local full/empty checks).
 
 ## Overview
 
