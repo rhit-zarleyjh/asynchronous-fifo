@@ -6,6 +6,28 @@ The design uses dual-clock storage, binary and Gray-coded pointers, two-stage po
 
 This demonstrates the ability to use structures that naturally lend themselves to the task at hand (Gray-coded pointers) and establish correctness under uncertain conditions (domain-local full/empty checks).
 
+```
+                                       ┌──────────────────┐                                        
+                      wr_data─────────►│       MEM[]      ├──────────►rd_data                      
+                                       │DATA_WIDTH x DEPTH│                                        
+                                       └▲───▲────────▲───▲┘                                        
+                                        │   │        │   │                                         
+                                        │   │        │   │                                         
+          ┌────────────────────────────full │        │  empty──────────────────────────┐           
+          │        ┌────────────────────────┘        └────────────────────────┐        │           
+          │        │          ┌────┐                           ┌────┐         │        │           
+          │    write_ptr──────►2-FF├─────────────────────┐     │2-FF◄──────read_ptr    │           
+          │        │          │Sync│ ┌───────────────────┼─────┤Sync│         │        │           
+          │        │          └────┘ │                   │     └────┘         │        │           
+          │ ┌──────┴─────┐           │                   │               ┌────┴──────┐ │           
+          └─┤Write Domain│           │                   │               │Read Domain┼─┘           
+            │            │        Synced               Synced            │           │             
+wr_clk─────►│    Full    ◄───────read_ptr             write_ptr──────────►   Empty   │◄──────rd_clk
+            │   Control  │                                               │  Control  │             
+            └────────────┘                                               └───────────┘             
+          WRITE CLOCK DOMAIN                                           READ CLOCK DOMAIN           
+```
+
 ## Overview
 
 Directly synchronizing every bit of a multi-bit bus does not guarantee a coherent destination value. Individual bits can be sampled at different points in their transitions, potentially producing a combination that never existed in the source domain.
