@@ -4,7 +4,7 @@ This SystemVerilog asynchronous FIFO demonstrates fundamental clock-domain cross
 
 The design uses dual-clock storage, binary and Gray-coded pointers, two-stage pointer synchronizers, and domain-local full/empty generation. Essentially, we transform standard pointers, which allow us to read to and write from memory, into Gray-coded pointers. This allows us to safely change our pointer value such that, even with metastability, we will never pass a dangerous value downstream, where it might cause true issues. Instead, we will either pass a fresh value, or a past value, both of which will be safe. The input-side domain checks for the FIFO being full to prevent the module claiming to be able to hold data while being full, resulting in data loss. Likewise, the output-side domain checks for the FIFO being empty, preventing us from accidentally outputting a value that was never truly given.
 
-This demonstrates the ability to use structures that naturally lend themselves to the task at hand (Gray-coded pointers) and establish correctness under uncertain conditions (domain-local full/empty checks).
+Developing this project changed my understanding of CDC from a generic register-level technique to something that requires reasoning about which information can safely cross a domain boundary and how delated remote state affects correctness. In particular, this project taught me why independently synchronizing a multi-bit bus is unsafe, why synchronization latency is an acceptable tradeoff for safety, and why Gray-coded pointers naturally fit this situation.
 
 ```
                                        ┌──────────────────┐                                        
